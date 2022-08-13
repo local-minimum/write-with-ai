@@ -27,7 +27,12 @@ def create_game():
     if prompt is None:
         abort(400, 'Missing prompt')
 
-    return jsonify(get_target_words(prompt))
+    per_player = 3
+    words = get_target_words(prompt, n=(2 * per_player))
+
+    human = words[:per_player]
+    ai = words[per_player:]
+    return jsonify({ 'human': human, 'ai': ai })
 
 
 @app.post('/api/play')
