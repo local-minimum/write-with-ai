@@ -28,7 +28,17 @@ function GameContainer(): JSX.Element {
   return (
     <>
       <Preamble gameState={gameState} onNextState={handleNextState} />
-      <Game />
+      <Game
+        gameState={gameState}
+        text={[
+          ['This', true], [' ', true],
+          ['was', true], [' ', true],
+          ['a', true], [' ', true],
+          ['story', true], [' ', true],
+          ['about', true], [' ', true],
+          ['collaboration', false], ['.', false],
+        ]}
+      />
     </>
   );
 }
