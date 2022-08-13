@@ -11,7 +11,7 @@ MAX_CONTEXT = 26
 
 @cache
 def load_model() -> KeyedVectors:
-    return KeyedVectors.load(os.path.join(os.path.dirname(__file__), 'model'))
+    return KeyedVectors.load(os.path.join(os.path.dirname(__file__), 'data', 'model'))
 
 
 def unique(options: list[str]) -> list[str]:

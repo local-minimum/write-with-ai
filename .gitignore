@@ -130,5 +130,5 @@ dmypy.json
 
 
 # Ignore the model
-/with_ai/model
-/with_ai/model.vectors.npy
+/with_ai/data/model
+/with_ai/data/model.vectors.npy
