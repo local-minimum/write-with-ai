@@ -4,5 +4,5 @@ You write a word, the AI writes one. Can you collaborate so that you include eac
 
 ## Credits
 
-### Dataset from
+### Dataset used (but on included here)
 Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. GloVe: Global Vectors for Word Representation
