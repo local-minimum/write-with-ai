@@ -4,14 +4,14 @@ version: '3.3'
 services:
   with_ai_gateway:
     image: nginx
-    ports: ["8088:80"]
+    ports: ["8099:80"]
     restart: unless-stopped
     volumes:
       - ./gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./gateway/well-known:/www/data/.well-known:ro
     depends_on:
       - with_ai_api
-      # - with_ai_frontend
+      - with_ai_frontend
 
   with_ai_api:
     build: .
@@ -23,7 +23,7 @@ services:
     environment:
       - WIA_LOGLEVEL
 
-  # with_ai_frontend:
-  #   build: ./tsclient
-  #   restart: unless-stopped
-  #   ports: ["80"]
+  with_ai_frontend:
+    build: ./tsclient
+    restart: unless-stopped
+    ports: ["80"]
