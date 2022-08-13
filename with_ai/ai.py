@@ -27,6 +27,7 @@ def get_target_words(
 ) -> list[str]:
     model = load_model()
     text = list(w.lower() for w in prompt if w in model)
+    original = list(text)
 
     for _ in range(pre):
         (w, _) = model.most_similar(positive=text[-MAX_CONTEXT:])[0]
@@ -37,7 +38,8 @@ def get_target_words(
     for _ in range(samples):
         (w, _) = model.most_similar(positive=text[-MAX_CONTEXT:])[0]
         text.append(w)
-        options.append(w)
+        if w not in original:
+            options.append(w)
 
     options = unique(options)
     return list(sample(options, n))
@@ -63,4 +65,4 @@ def get_next_word(
     return sorted(
         options,
         key=lambda option: option[1] if option[0] not in text else option[1] * 0.5,
-    ).pop()
+    ).pop()[0]
