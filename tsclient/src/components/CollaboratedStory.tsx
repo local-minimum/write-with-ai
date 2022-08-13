@@ -8,7 +8,7 @@ interface CollaboratedStoryProps {
 
 function CollaboratedStory({ story }: CollaboratedStoryProps): JSX.Element {
   return (
-    <Typography sx={{ fontFamily: 'monospace', padding: 2 }}>
+    <Typography sx={{ fontFamily: 'monospace', padding: 2, flex: 1 }}>
       {story.map(([word, byHuman], idx) => (
         <TextWordSpan
           // eslint-disable-next-line react/no-array-index-key

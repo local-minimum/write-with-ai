@@ -1,5 +1,5 @@
 import {
-  Paper, Typography, Box,
+  Paper, Typography, Stack,
 } from '@mui/material';
 import * as React from 'react';
 import { SecretWords } from '../api/types';
@@ -26,10 +26,10 @@ function Game({ secretWords, text, gameState }: GameProps): JSX.Element {
   return (
     <Paper sx={{ m: 2, minHeight: '90vh', padding: 1 }} elevation={2}>
       <Typography variant="h1">Collaborate Human!</Typography>
-      <Box sx={{ maxWidth: '800px' }}>
+      <Stack sx={{ maxWidth: '800px' }} gap={1}>
         <SecretWordsView secretWords={secretWords} />
         <CollaboratedStory story={text} />
-      </Box>
+      </Stack>
     </Paper>
   );
 }
