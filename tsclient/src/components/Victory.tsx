@@ -28,9 +28,13 @@ function Victory({
     >
       <DialogTitle>
         <FontAwesomeIcon icon={faPerson} />
+        {' '}
         Team
+        {' '}
         <FontAwesomeIcon icon={faHandshake} />
+        {' '}
         Work
+        {' '}
         <FontAwesomeIcon icon={faRobot} />
       </DialogTitle>
       <DialogContent>
@@ -58,6 +62,7 @@ function Victory({
           startIcon={<FontAwesomeIcon icon={faPerson} />}
           endIcon={<FontAwesomeIcon icon={faRobot} />}
           title="Become an even stronger team"
+          variant="outlined"
         >
           New Game
         </Button>

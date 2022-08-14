@@ -6,6 +6,7 @@ import {
 import * as React from 'react';
 import { SecretWords } from '../api/types';
 import GameState from '../GameState';
+import { isPunctuation } from '../tools/guess';
 import CollaboratedStory from './CollaboratedStory';
 import GuessInput from './GuessInput';
 import SecretWordsView from './SecretWordsView';
@@ -19,6 +20,7 @@ interface GameProps {
   onAddGuess: (word: string) => void;
   smallVictory: boolean;
   onProgressGameState: () => void;
+  onResetGame: () => void;
 }
 
 /*
@@ -31,14 +33,19 @@ interface GameProps {
 
 function Game({
   secretWords, story, gameState, humanTurn, onAddGuess, smallVictory,
-  onProgressGameState,
+  onProgressGameState, onResetGame,
 }: GameProps): JSX.Element {
+  const words = story.filter(([lex]) => !isPunctuation(lex)).length;
+
   return (
     <Paper sx={{ m: 2, minHeight: '90vh', padding: 1 }} elevation={2}>
       <Typography variant="h1">Collaborate Human!</Typography>
       <Stack sx={{ maxWidth: '800px' }} gap={1}>
         <SecretWordsView secretWords={secretWords} gameState={gameState} />
         <CollaboratedStory story={story} />
+        <Typography variant="caption" gutterBottom>
+          {`${words} word${words === 1 ? '' : 's'}`}
+        </Typography>
         <GuessInput
           story={story}
           gameState={gameState}
@@ -46,8 +53,8 @@ function Game({
           humanTurn={humanTurn}
           onAddGuess={onAddGuess}
         />
-        {gameState === GameState.Play && smallVictory && (
-          <Stack>
+        <Stack direction="row">
+          {gameState === GameState.Play && smallVictory && (
             <Button
               variant="outlined"
               onClick={onProgressGameState}
@@ -57,9 +64,20 @@ function Game({
             >
               Claim minor victory.
             </Button>
-            <Box sx={{ flex: 1 }} />
-          </Stack>
-        )}
+          )}
+          {gameState === GameState.Play && !smallVictory && words > 150 && (
+            <Button
+              variant="outlined"
+              onClick={onResetGame}
+              title="Have made a long text together and that at least counts for something"
+              startIcon={<FontAwesomeIcon icon={faPerson} />}
+              endIcon={<FontAwesomeIcon icon={faRobot} />}
+            >
+              Give up / Get new attempt
+            </Button>
+          )}
+          <Box sx={{ flex: 1 }} />
+        </Stack>
       </Stack>
     </Paper>
   );

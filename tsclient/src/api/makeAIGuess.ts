@@ -10,7 +10,7 @@ function makeAIGuess(
   secretWords: SecretWords | undefined,
   lead = false,
   target: string | undefined = undefined,
-): Promise<TextWord[]> {
+): Promise<string> {
   const remainingLengths = secretWords?.human
     .filter(([_, revealed]) => !revealed)
     .map(([lex]) => lex.length) ?? [];
@@ -45,7 +45,7 @@ function makeAIGuess(
       }
       throw new Error('Failed to make AI guess');
     })
-    .then(({ guess }) => [...story, [' ', false], [guess, false]]);
+    .then(({ guess }) => guess);
 }
 
 export default makeAIGuess;

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 import createGame from '../api/createGame';
 import makeAIGuess from '../api/makeAIGuess';
@@ -9,17 +9,28 @@ import { TextWord } from '../components/TextWord';
 import Victory from '../components/Victory';
 
 import GameState from '../GameState';
+import usePrevious from '../hooks/usePrevious';
 import useStoredValue from '../hooks/useStoredValue';
 import {
-  asLex, isPunctuation, isSpace, reveal,
+  asLex, isPunctuation, isSpace, reveal, transformGuess,
 } from '../tools/guess';
 import generate from '../tools/prompt';
 
 function GameContainer(): JSX.Element {
+  const queryClient = useQueryClient();
+  const [leadHidden, setLeadHidden] = React.useState<number>(0);
+
   const [gameState, setGameState] = useStoredValue<GameState>('game-state', GameState.Preamble);
   const [story, setStory] = useStoredValue<TextWord[]>('story', []);
   const [secretWords, setSecretWords] = useStoredValue<SecretWords | undefined>('secret-words', undefined);
   const [humanTurn, setHumanTurn] = useStoredValue<boolean>('human-turn', false);
+
+  const prevStoryLength = usePrevious(story.length);
+
+  const handleResetGame = React.useCallback((): void => {
+    setSecretWords(undefined);
+    setGameState(GameState.Prompt);
+  }, [setGameState, setSecretWords]);
 
   const handleNextState = React.useCallback((): void => {
     switch (gameState) {
@@ -57,21 +68,27 @@ function GameContainer(): JSX.Element {
 
   useQuery(
     ['ai-guess'],
-    () => makeAIGuess(story, secretWords),
+    () => makeAIGuess(story, secretWords, leadHidden < 0),
     {
       enabled: gameState === GameState.Play && !humanTurn,
-      onSuccess(newStory) {
-        setStory(newStory);
+      onSuccess(lex) {
+        const isWord = !isPunctuation(lex);
 
         if (secretWords !== undefined) {
-          const [lex] = newStory[newStory.length - 1];
           const idx = secretWords.human.findIndex(([sLex]) => sLex === lex);
           if (idx >= 0) {
             setSecretWords({ human: reveal(secretWords.human, idx), ai: secretWords.ai });
           }
         }
 
-        setHumanTurn(true);
+        const word = transformGuess(lex, story[story.length - 1]?.[0]);
+        if (isWord) {
+          setStory([...story, [' ', false], [word, false]]);
+          setHumanTurn(true);
+        } else {
+          setStory([...story, [word, false]]);
+          queryClient.invalidateQueries(['ai-guess']);
+        }
       },
     },
   );
@@ -87,9 +104,10 @@ function GameContainer(): JSX.Element {
       }
     }
 
-    setStory([...story, [' ', false], [guess, true]]);
-
-    if (!isPunctuation(guess)) {
+    if (isPunctuation(guess)) {
+      setStory([...story, [guess, true]]);
+    } else {
+      setStory([...story, [' ', false], [guess, true]]);
       setHumanTurn(false);
     }
   }, [secretWords, setHumanTurn, setSecretWords, setStory, story]);
@@ -122,12 +140,34 @@ function GameContainer(): JSX.Element {
     }
   }, [majorVictory, gameState, handleNextState, setStory]);
 
+  React.useEffect(() => {
+    if (prevStoryLength === story.length || gameState !== GameState.Play) return;
+
+    const remainHuman = secretWords?.human.filter(([, revealed]) => !revealed).length ?? 0;
+    const remainAI = secretWords?.ai.filter(([, revealed]) => !revealed).length ?? 0;
+
+    if (leadHidden < 0) {
+      const stay = 1 + (remainAI + 1) / (remainHuman + 1);
+      const leave = remainHuman > 0 ? Math.abs(leadHidden) / 5 : 0;
+      const switchMode = Math.random() * (stay + leave) > stay;
+      setLeadHidden(switchMode ? 1 : leadHidden - 1);
+    } else if (leadHidden > 0) {
+      const stay = 1 + (remainHuman + 1) / (remainAI + 1);
+      const leave = remainAI > 0 ? leadHidden / 5 : 0;
+      const switchMode = Math.random() * (stay + leave) > stay;
+      setLeadHidden(switchMode ? -1 : leadHidden + 1);
+    } else {
+      const lead = Math.random() > 0.8 ? -1 : 1;
+      setLeadHidden(lead ? -1 : 1);
+    }
+  }, [gameState, prevStoryLength, secretWords, story.length, leadHidden, setLeadHidden]);
+
   return (
     <>
       <Preamble gameState={gameState} onNextState={handleNextState} />
       <Victory
         gameState={gameState}
-        onNewGame={handleNextState}
+        onNewGame={handleResetGame}
         majorVictory={majorVictory}
         story={story}
       />
@@ -139,6 +179,7 @@ function GameContainer(): JSX.Element {
         humanTurn={humanTurn}
         smallVictory={smallVictory}
         onProgressGameState={handleNextState}
+        onResetGame={handleResetGame}
       />
     </>
   );

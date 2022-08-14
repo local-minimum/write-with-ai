@@ -46,6 +46,8 @@ def get_target_words(
             options.append(w)
 
     options = unique(options)
+    # TODO: Consider weighting based on word length with prio for 3-5 long words
+
     return list(sample(options, n))
 
 
@@ -58,8 +60,10 @@ def get_next_word(
 ) -> str:
     model = load_model()
     text = list(w.lower().strip() for w in prompt if w in model)
-    options = model.most_similar(positive=text[-MAX_CONTEXT:])
 
+    options = model.most_similar(
+        positive=text[-MAX_CONTEXT:] + [target] if target and lead else [],
+    )
     options = [(lex, weight) for lex, weight in options if lex not in secrets]
 
     if target is not None:

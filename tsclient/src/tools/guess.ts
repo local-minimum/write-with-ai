@@ -6,7 +6,7 @@ export function isSpace(word: string): boolean {
 
 export function isPunctuation(word: string): boolean {
   // eslint-disable-next-line no-useless-escape
-  return word.replace(/[ .:?!;_/\\+*=%&^@#$()[\]{}<>'"\-]*/g, '').length === 0;
+  return word.replace(/[ ,.:?!;_/\\+*=%&^@#$()[\]{}<>'"\-]*/g, '').length === 0;
 }
 
 export function asLex(word: string): string {
@@ -21,4 +21,14 @@ export function reveal(
     .map(([lex, revealed], idx) => (idx === position ? [lex, true] : [lex, revealed])) as [
       SecretWord, SecretWord, SecretWord
     ];
+}
+
+export function transformGuess(
+  lex: string,
+  previousLex: string | undefined,
+): string {
+  if (lex === 'i') return 'I';
+  if (lex === 'i\'m') return 'I\'m';
+  if (lex.length >= 1 && ['.', '!', '?'].includes(previousLex ?? '')) return lex[0].toUpperCase() + lex.slice(1);
+  return lex;
 }
