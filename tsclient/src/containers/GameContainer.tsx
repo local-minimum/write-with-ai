@@ -55,7 +55,7 @@ function GameContainer(): JSX.Element {
 
   useQuery(
     ['ai-guess'],
-    () => makeAIGuess(story),
+    () => makeAIGuess(story, secretWords),
     {
       enabled: gameState === GameState.Play && !humanTurn,
       onSuccess(newStory) {

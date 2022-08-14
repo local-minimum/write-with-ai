@@ -3,7 +3,7 @@ import os
 from random import sample
 from typing import Optional
 
-from gensim.models.keyedvectors import KeyedVectors
+from gensim.models.keyedvectors import KeyedVectors  # type: ignore
 
 
 MAX_CONTEXT = 26
@@ -11,7 +11,11 @@ MAX_CONTEXT = 26
 
 @cache
 def load_model() -> KeyedVectors:
-    return KeyedVectors.load(os.path.join(os.path.dirname(__file__), 'data', 'model'))
+    return KeyedVectors.load(os.path.join(
+        os.path.dirname(__file__),
+        'data',
+        'model',
+    ))
 
 
 def unique(options: list[str]) -> list[str]:
@@ -48,7 +52,8 @@ def get_target_words(
 def get_next_word(
     prompt: list[str],
     lead: bool,
-    target: Optional[str]
+    target: Optional[str],
+    guess_word_lengths: list[int],
 ) -> str:
     model = load_model()
     text = list(w.lower().strip() for w in prompt if w in model)
@@ -62,7 +67,16 @@ def get_next_word(
                 weight + weight2 if lead else weight + 0.1 * weight2
             )
 
+    if guess_word_lengths:
+        for i, (word, weight) in enumerate(options):
+            options[i] = (
+                word,
+                weight * 1.5 if len(word) in guess_word_lengths else weight,
+            )
+
     return sorted(
         options,
-        key=lambda option: option[1] if option[0] not in text else option[1] * 0.5,
+        key=lambda option: (
+            option[1] if option[0] not in text else option[1] * 0.5
+        ),
     ).pop()[0]

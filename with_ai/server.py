@@ -17,6 +17,10 @@ app = Flask('Collab with AI')
 app.config['SECRET_KEY'] = token_urlsafe(16)
 
 
+def definedOr(value, fallback):
+    return fallback if value is None else value
+
+
 @app.post('/api/create')
 def create_game():
     prompt = request.get_json()
@@ -29,7 +33,7 @@ def create_game():
 
     human = words[:per_player]
     ai = words[per_player:]
-    return jsonify({ 'human': human, 'ai': ai })
+    return jsonify({'human': human, 'ai': ai})
 
 
 @app.post('/api/play')
@@ -44,5 +48,8 @@ def play_game():
 
     lead = json.get('lead', False)
     target = json.get('target')
+    guess_word_lengths = definedOr(json.get('guessWordLengths'), [])
 
-    return jsonify({'guess': get_next_word(prompt, lead, target)})
+    return jsonify({
+        'guess': get_next_word(prompt, lead, target, guess_word_lengths),
+    })

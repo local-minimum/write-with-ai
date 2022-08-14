@@ -1,4 +1,5 @@
 import { TextWord } from '../components/TextWord';
+import { SecretWords } from './types';
 
 interface GuessResponse {
   guess: string;
@@ -6,6 +7,7 @@ interface GuessResponse {
 
 function makeAIGuess(
   story: TextWord[],
+  secretWords: SecretWords | undefined,
   lead = false,
   target: string | undefined = undefined,
 ): Promise<TextWord[]> {
@@ -22,6 +24,7 @@ function makeAIGuess(
         prompt: story.map(([word]) => word).filter((word) => word !== ''),
         lead,
         target,
+        guessWordLengths: secretWords?.human.map((w) => w.length),
       }),
     },
   )
