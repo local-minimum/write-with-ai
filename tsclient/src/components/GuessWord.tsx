@@ -6,7 +6,10 @@ const Hidden = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
-  padding: 2,
+  paddingLeft: 8,
+  paddingRight: 8,
+  paddingTop: 2,
+  paddingBottom: 2,
 });
 
 const Solved = styled('span')({
@@ -14,7 +17,10 @@ const Solved = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
-  padding: 2,
+  paddingLeft: 8,
+  paddingRight: 8,
+  paddingTop: 2,
+  paddingBottom: 2,
   textTransform: 'uppercase',
 });
 
@@ -23,7 +29,10 @@ const Unsolved = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
-  padding: 2,
+  paddingLeft: 8,
+  paddingRight: 8,
+  paddingTop: 2,
+  paddingBottom: 2,
   textTransform: 'uppercase',
 });
 

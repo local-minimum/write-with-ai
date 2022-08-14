@@ -55,7 +55,7 @@ function GameContainer(): JSX.Element {
 
   const handleResetGame = React.useCallback((): void => {
     setSecretWords(undefined);
-    setGameState(GameState.Prompt);
+    setGameState(GameState.Introduction);
   }, [setGameState, setSecretWords]);
 
   const handleNextState = React.useCallback((): void => {
