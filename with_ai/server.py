@@ -45,4 +45,4 @@ def play_game():
     lead = json.get('lead', False)
     target = json.get('target')
 
-    return jsonify(get_next_word(prompt, lead, target))
+    return jsonify({'guess': get_next_word(prompt, lead, target)})

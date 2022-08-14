@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import createGame from '../api/createGame';
+import makeAIGuess from '../api/makeAIGuess';
 import { SecretWords } from '../api/types';
 import Game from '../components/Game';
 import Preamble from '../components/Preable';
@@ -45,8 +46,29 @@ function GameContainer(): JSX.Element {
       staleTime: Infinity,
       enabled: gameState === GameState.Setup,
       onSuccess(data) {
-        handleNextState();
         setSecretWords(data);
+        setHumanTurn(true);
+        handleNextState();
+      },
+    },
+  );
+
+  useQuery(
+    ['ai-guess'],
+    () => makeAIGuess(story),
+    {
+      enabled: gameState === GameState.Play && !humanTurn,
+      onSuccess(newStory) {
+        setStory(newStory);
+
+        if (secretWords !== undefined) {
+          const [lex] = newStory[newStory.length - 1];
+          const idx = secretWords.human.findIndex(([sLex]) => sLex === lex);
+          if (idx >= 0) {
+            setSecretWords({ human: reveal(secretWords.human, idx), ai: secretWords.ai });
+          }
+        }
+
         setHumanTurn(true);
       },
     },
