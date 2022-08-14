@@ -17,6 +17,7 @@ function CollaboratedStory({ story }: CollaboratedStoryProps): JSX.Element {
           byHuman={byHuman}
         />
       ))}
+      <TextWordSpan word="..." byHuman={false} />
     </Typography>
   );
 }

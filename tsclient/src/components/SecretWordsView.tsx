@@ -11,24 +11,28 @@ function SecretWordsView({ secretWords }: SecretWordsViewProps): JSX.Element {
   return (
     <Grid container>
       <Grid item xs={6}>
-        <Typography variant="h6">Your secret words</Typography>
+        <Typography variant="h6">Your secret words:</Typography>
       </Grid>
       <Grid item xs={6}>
-        <Typography variant="h6">AI&apos;s secret words</Typography>
+        <Typography variant="h6">AI&apos;s secret words:</Typography>
       </Grid>
       <Grid item xs={6}>
-        {secretWords === undefined ? (
-          <i>Waiting for game...</i>
-        ) : secretWords.human.map(([word, revealed]) => (
-          <GuessWordSpan key={word} word={word} revealed={revealed} humanWord />
-        ))}
+        <Typography variant={secretWords === undefined ? 'caption' : 'h6'}>
+          {secretWords === undefined ? (
+            <i>Waiting for game...</i>
+          ) : secretWords.human.map(([word, revealed]) => (
+            <GuessWordSpan key={word} word={word} revealed={revealed} humanWord />
+          ))}
+        </Typography>
       </Grid>
       <Grid item xs={6}>
-        {secretWords === undefined ? (
-          <i>Waiting for game...</i>
-        ) : secretWords.ai.map(
-          ([word, revealed]) => <GuessWordSpan key={word} word={word} revealed={revealed} />,
-        )}
+        <Typography variant={secretWords === undefined ? 'caption' : 'h6'}>
+          {secretWords === undefined ? (
+            <i>Waiting for game...</i>
+          ) : secretWords.ai.map(
+            ([word, revealed]) => <GuessWordSpan key={word} word={word} revealed={revealed} />,
+          )}
+        </Typography>
       </Grid>
     </Grid>
   );

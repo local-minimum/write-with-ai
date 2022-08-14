@@ -6,6 +6,7 @@ const Hidden = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
+  padding: 2,
 });
 
 const Solved = styled('span')({
@@ -13,6 +14,8 @@ const Solved = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
+  padding: 2,
+  textTransform: 'uppercase',
 });
 
 const Unsolved = styled('span')({
@@ -20,6 +23,8 @@ const Unsolved = styled('span')({
   fontFamily: 'monospace',
   marginLeft: 2,
   marginRight: 2,
+  padding: 2,
+  textTransform: 'uppercase',
 });
 
 interface GuessWordProps {
@@ -31,7 +36,7 @@ interface GuessWordProps {
 function GuessWordSpan({ word, revealed, humanWord = false }: GuessWordProps): JSX.Element {
   if (revealed) return <Solved>{word}</Solved>;
   if (humanWord) return <Unsolved>{word}</Unsolved>;
-  return <Hidden>{word.replace(/./, '\u00A0')}</Hidden>;
+  return <Hidden>{word.replace(/./g, '\u00A0')}</Hidden>;
 }
 
 export default GuessWordSpan;
