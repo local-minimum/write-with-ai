@@ -2,12 +2,15 @@ import * as React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { SecretWords } from '../api/types';
 import GuessWordSpan from './GuessWord';
+import GameState from '../GameState';
 
 interface SecretWordsViewProps {
   secretWords?: SecretWords;
+  gameState: GameState;
 }
 
-function SecretWordsView({ secretWords }: SecretWordsViewProps): JSX.Element {
+function SecretWordsView({ secretWords, gameState }: SecretWordsViewProps): JSX.Element {
+  const revealAll = gameState === GameState.Victory;
   return (
     <Grid container>
       <Grid item xs={6}>
@@ -21,7 +24,7 @@ function SecretWordsView({ secretWords }: SecretWordsViewProps): JSX.Element {
           {secretWords === undefined ? (
             <i>Waiting for game...</i>
           ) : secretWords.human.map(([word, revealed]) => (
-            <GuessWordSpan key={word} word={word} revealed={revealed} humanWord />
+            <GuessWordSpan key={word} word={word} revealed={revealed || revealAll} humanWord />
           ))}
         </Typography>
       </Grid>
@@ -30,7 +33,9 @@ function SecretWordsView({ secretWords }: SecretWordsViewProps): JSX.Element {
           {secretWords === undefined ? (
             <i>Waiting for game...</i>
           ) : secretWords.ai.map(
-            ([word, revealed]) => <GuessWordSpan key={word} word={word} revealed={revealed} />,
+            ([word, revealed]) => (
+              <GuessWordSpan key={word} word={word} revealed={revealed || revealAll} />
+            ),
           )}
         </Typography>
       </Grid>

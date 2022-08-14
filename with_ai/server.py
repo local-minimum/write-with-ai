@@ -17,7 +17,7 @@ app = Flask('Collab with AI')
 app.config['SECRET_KEY'] = token_urlsafe(16)
 
 
-def definedOr(value, fallback):
+def defined_or(value, fallback):
     return fallback if value is None else value
 
 
@@ -48,8 +48,9 @@ def play_game():
 
     lead = json.get('lead', False)
     target = json.get('target')
-    guess_word_lengths = definedOr(json.get('guessWordLengths'), [])
+    guess_word_lengths = defined_or(json.get('guessWordLengths'), [])
+    secrets = defined_or(json.get('aiSecrets'), [])
 
     return jsonify({
-        'guess': get_next_word(prompt, lead, target, guess_word_lengths),
+        'guess': get_next_word(prompt, lead, target, guess_word_lengths, secrets),
     })

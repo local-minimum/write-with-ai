@@ -6,6 +6,7 @@ import { SecretWords } from '../api/types';
 import Game from '../components/Game';
 import Preamble from '../components/Preable';
 import { TextWord } from '../components/TextWord';
+import Victory from '../components/Victory';
 
 import GameState from '../GameState';
 import useStoredValue from '../hooks/useStoredValue';
@@ -33,11 +34,12 @@ function GameContainer(): JSX.Element {
       case GameState.Play:
         return setGameState(GameState.Victory);
       case GameState.Victory:
+        setSecretWords(undefined);
         return setGameState(GameState.Prompt);
       default:
         return setGameState(GameState.Preamble);
     }
-  }, [gameState, setGameState]);
+  }, [gameState, setGameState, setSecretWords]);
 
   useQuery(
     ['generate'],
@@ -92,24 +94,51 @@ function GameContainer(): JSX.Element {
     }
   }, [secretWords, setHumanTurn, setSecretWords, setStory, story]);
 
+  const [smallVictory, majorVictory] = React.useMemo(() => {
+    if (
+      secretWords === undefined
+      || (gameState !== GameState.Play && gameState !== GameState.Victory)
+    ) {
+      return [false, false];
+    }
+
+    const revealed = secretWords.ai.filter(([_, rev]) => rev).length
+      + secretWords.human.filter(([_, rev]) => rev).length;
+
+    return [
+      revealed >= 5 && story.length > 200,
+      revealed === 6,
+    ];
+  }, [gameState, secretWords, story.length]);
+
   React.useEffect(() => {
     if (gameState === GameState.Introduction) {
       handleNextState();
     } else if (gameState === GameState.Prompt) {
       setStory(generate());
       handleNextState();
+    } else if (gameState === GameState.Play && majorVictory) {
+      handleNextState();
     }
-  }, [gameState, handleNextState, setStory]);
+  }, [majorVictory, gameState, handleNextState, setStory]);
 
   return (
     <>
       <Preamble gameState={gameState} onNextState={handleNextState} />
+      <Victory
+        gameState={gameState}
+        onNewGame={handleNextState}
+        majorVictory={majorVictory}
+        story={story}
+      />
       <Game
         gameState={gameState}
         story={story}
         secretWords={secretWords}
         onAddGuess={handleHumanGuess}
         humanTurn={humanTurn}
+        smallVictory={smallVictory}
+        onProgressGameState={handleNextState}
       />
     </>
   );

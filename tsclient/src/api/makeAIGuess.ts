@@ -11,6 +11,16 @@ function makeAIGuess(
   lead = false,
   target: string | undefined = undefined,
 ): Promise<TextWord[]> {
+  const remainingLengths = secretWords?.human
+    .filter(([_, revealed]) => !revealed)
+    .map(([lex]) => lex.length) ?? [];
+
+  const shallLead = lead || remainingLengths.length === 0;
+  const remainingSecrets = secretWords?.ai
+    .filter(([_, revealed]) => !revealed)
+    .map(([lex]) => lex) ?? [];
+  const mustTarget = target ?? (shallLead ? remainingSecrets[0] : undefined);
+
   return fetch(
     './api/play',
     {
@@ -21,10 +31,11 @@ function makeAIGuess(
       redirect: 'follow',
       referrerPolicy: 'no-referrer',
       body: JSON.stringify({
-        prompt: story.map(([word]) => word).filter((word) => word !== ''),
-        lead,
-        target,
-        guessWordLengths: secretWords?.human.map((w) => w.length),
+        prompt: story.map(([word]) => word).filter((word) => word !== ' '),
+        lead: shallLead,
+        target: mustTarget,
+        guessWordLengths: remainingLengths,
+        aiSecrets: remainingSecrets,
       }),
     },
   )

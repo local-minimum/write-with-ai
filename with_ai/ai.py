@@ -26,7 +26,7 @@ def get_target_words(
     prompt: list[str],
     *,
     n: int = 6,
-    pre: int = 25,
+    pre: int = 50,
     samples: int = 50,
 ) -> list[str]:
     model = load_model()
@@ -54,10 +54,13 @@ def get_next_word(
     lead: bool,
     target: Optional[str],
     guess_word_lengths: list[int],
+    secrets: list[str],
 ) -> str:
     model = load_model()
     text = list(w.lower().strip() for w in prompt if w in model)
     options = model.most_similar(positive=text[-MAX_CONTEXT:])
+
+    options = [(lex, weight) for lex, weight in options if lex not in secrets]
 
     if target is not None:
         for i, (word, weight) in enumerate(options):
@@ -67,8 +70,13 @@ def get_next_word(
                 weight + weight2 if lead else weight + 0.1 * weight2
             )
 
-    if guess_word_lengths:
-        for i, (word, weight) in enumerate(options):
+    for i, (word, weight) in enumerate(options):
+        if word in text:
+            options[i] = (
+                word,
+                weight * 0.1
+            )
+        elif guess_word_lengths:
             options[i] = (
                 word,
                 weight * 1.5 if len(word) in guess_word_lengths else weight,
