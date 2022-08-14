@@ -60,10 +60,9 @@ def get_next_word(
 ) -> str:
     model = load_model()
     text = list(w.lower().strip() for w in prompt if w in model)
+    vec = text[-MAX_CONTEXT:] + ([target] if target and lead else [])
 
-    options = model.most_similar(
-        positive=text[-MAX_CONTEXT:] + [target] if target and lead else [],
-    )
+    options = model.most_similar(positive=vec)
     options = [(lex, weight) for lex, weight in options if lex not in secrets]
 
     if target is not None:

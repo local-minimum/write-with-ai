@@ -25,7 +25,33 @@ function GameContainer(): JSX.Element {
   const [secretWords, setSecretWords] = useStoredValue<SecretWords | undefined>('secret-words', undefined);
   const [humanTurn, setHumanTurn] = useStoredValue<boolean>('human-turn', false);
 
-  const prevStoryLength = usePrevious(story.length);
+  const prevHumanTurn = usePrevious(humanTurn);
+
+  const updateAIHMM = React.useCallback(() => {
+    const remainHuman = secretWords?.human.filter(([, revealed]) => !revealed).length ?? 0;
+    const remainAI = secretWords?.ai.filter(([, revealed]) => !revealed).length ?? 0;
+
+    if (leadHidden < 0) {
+      const stay = 1 + (remainAI + 1) / (remainHuman + 1);
+      const leave = remainHuman > 0 ? Math.abs(leadHidden) / 5 : 0;
+      const switchMode = Math.random() * (stay + leave) > stay;
+      setLeadHidden(switchMode ? 1 : leadHidden - 1);
+    } else if (leadHidden > 0) {
+      const stay = 1 + (remainHuman + 1) / (remainAI + 1);
+      const leave = remainAI > 0 ? leadHidden / 5 : 0;
+      const switchMode = Math.random() * (stay + leave) > stay;
+      setLeadHidden(switchMode ? -1 : leadHidden + 1);
+    } else {
+      const lead = Math.random() > 0.8 ? -1 : 1;
+      setLeadHidden(lead ? -1 : 1);
+    }
+  }, [secretWords, leadHidden, setLeadHidden]);
+
+  React.useEffect(() => {
+    if (prevHumanTurn === false && humanTurn) {
+      updateAIHMM();
+    }
+  }, [humanTurn, prevHumanTurn, updateAIHMM]);
 
   const handleResetGame = React.useCallback((): void => {
     setSecretWords(undefined);
@@ -58,7 +84,7 @@ function GameContainer(): JSX.Element {
     {
       staleTime: Infinity,
       enabled: gameState === GameState.Setup,
-      onSuccess(data) {
+      onSuccess: (data) => {
         setSecretWords(data);
         setHumanTurn(true);
         handleNextState();
@@ -71,7 +97,7 @@ function GameContainer(): JSX.Element {
     () => makeAIGuess(story, secretWords, leadHidden < 0),
     {
       enabled: gameState === GameState.Play && !humanTurn,
-      onSuccess(lex) {
+      onSuccess: (lex) => {
         const isWord = !isPunctuation(lex);
 
         if (secretWords !== undefined) {
@@ -110,7 +136,9 @@ function GameContainer(): JSX.Element {
       setStory([...story, [' ', false], [guess, true]]);
       setHumanTurn(false);
     }
-  }, [secretWords, setHumanTurn, setSecretWords, setStory, story]);
+
+    updateAIHMM();
+  }, [secretWords, setHumanTurn, setSecretWords, setStory, story, updateAIHMM]);
 
   const [smallVictory, majorVictory] = React.useMemo(() => {
     if (
@@ -139,28 +167,6 @@ function GameContainer(): JSX.Element {
       handleNextState();
     }
   }, [majorVictory, gameState, handleNextState, setStory]);
-
-  React.useEffect(() => {
-    if (prevStoryLength === story.length || gameState !== GameState.Play) return;
-
-    const remainHuman = secretWords?.human.filter(([, revealed]) => !revealed).length ?? 0;
-    const remainAI = secretWords?.ai.filter(([, revealed]) => !revealed).length ?? 0;
-
-    if (leadHidden < 0) {
-      const stay = 1 + (remainAI + 1) / (remainHuman + 1);
-      const leave = remainHuman > 0 ? Math.abs(leadHidden) / 5 : 0;
-      const switchMode = Math.random() * (stay + leave) > stay;
-      setLeadHidden(switchMode ? 1 : leadHidden - 1);
-    } else if (leadHidden > 0) {
-      const stay = 1 + (remainHuman + 1) / (remainAI + 1);
-      const leave = remainAI > 0 ? leadHidden / 5 : 0;
-      const switchMode = Math.random() * (stay + leave) > stay;
-      setLeadHidden(switchMode ? -1 : leadHidden + 1);
-    } else {
-      const lead = Math.random() > 0.8 ? -1 : 1;
-      setLeadHidden(lead ? -1 : 1);
-    }
-  }, [gameState, prevStoryLength, secretWords, story.length, leadHidden, setLeadHidden]);
 
   return (
     <>
