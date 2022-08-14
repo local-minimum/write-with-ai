@@ -1,7 +1,10 @@
 FROM node:16-alpine as build
-COPY . /ui
+COPY package* /ui/
+COPY .eslintrc.json /ui/
+COPY tsconfig.json /ui/
 WORKDIR /ui
 RUN npm install react-scripts
+COPY . /ui
 RUN npm run-script build
 
 FROM nginx:stable-alpine

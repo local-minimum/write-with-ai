@@ -13,6 +13,8 @@ interface GameProps {
   secretWords?: SecretWords;
   story: TextWord[];
   gameState: GameState;
+  humanTurn: boolean;
+  onAddGuess: (word: string) => void;
 }
 
 /*
@@ -23,7 +25,9 @@ interface GameProps {
 #830A48
 */
 
-function Game({ secretWords, story, gameState }: GameProps): JSX.Element {
+function Game({
+  secretWords, story, gameState, humanTurn, onAddGuess,
+}: GameProps): JSX.Element {
   return (
     <Paper sx={{ m: 2, minHeight: '90vh', padding: 1 }} elevation={2}>
       <Typography variant="h1">Collaborate Human!</Typography>
@@ -33,8 +37,8 @@ function Game({ secretWords, story, gameState }: GameProps): JSX.Element {
         <GuessInput
           gameState={gameState}
           secretWords={secretWords}
-          humanTurn
-          onAddGuess={console.log}
+          humanTurn={humanTurn}
+          onAddGuess={onAddGuess}
         />
       </Stack>
     </Paper>

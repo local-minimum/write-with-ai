@@ -8,12 +8,16 @@ import { TextWord } from '../components/TextWord';
 
 import GameState from '../GameState';
 import useStoredValue from '../hooks/useStoredValue';
+import {
+  asLex, isPunctuation, isSpace, reveal,
+} from '../tools/guess';
 import generate from '../tools/prompt';
 
 function GameContainer(): JSX.Element {
   const [gameState, setGameState] = useStoredValue<GameState>('game-state', GameState.Preamble);
   const [story, setStory] = useStoredValue<TextWord[]>('story', []);
   const [secretWords, setSecretWords] = useStoredValue<SecretWords | undefined>('secret-words', undefined);
+  const [humanTurn, setHumanTurn] = useStoredValue<boolean>('human-turn', false);
 
   const handleNextState = React.useCallback((): void => {
     switch (gameState) {
@@ -43,9 +47,28 @@ function GameContainer(): JSX.Element {
       onSuccess(data) {
         handleNextState();
         setSecretWords(data);
+        setHumanTurn(true);
       },
     },
   );
+
+  const handleHumanGuess = React.useCallback((guess: string): void => {
+    if (isSpace(guess)) return;
+
+    if (secretWords !== undefined) {
+      const lex = asLex(guess);
+      const idx = secretWords.ai.findIndex(([sLex]) => sLex === lex);
+      if (idx >= 0) {
+        setSecretWords({ human: secretWords.human, ai: reveal(secretWords.ai, idx) });
+      }
+    }
+
+    setStory([...story, [' ', false], [guess, true]]);
+
+    if (!isPunctuation(guess)) {
+      setHumanTurn(false);
+    }
+  }, [secretWords, setHumanTurn, setSecretWords, setStory, story]);
 
   React.useEffect(() => {
     if (gameState === GameState.Introduction) {
@@ -63,6 +86,8 @@ function GameContainer(): JSX.Element {
         gameState={gameState}
         story={story}
         secretWords={secretWords}
+        onAddGuess={handleHumanGuess}
+        humanTurn={humanTurn}
       />
     </>
   );

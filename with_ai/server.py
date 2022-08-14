@@ -19,14 +19,11 @@ app.config['SECRET_KEY'] = token_urlsafe(16)
 
 @app.post('/api/create')
 def create_game():
-    json = request.get_json()
-    if json is None:
+    prompt = request.get_json()
+    if prompt is None:
         abort(400, 'Request must be json')
 
-    prompt = json.get('prompt')
-    if prompt is None:
-        abort(400, 'Missing prompt')
-
+    logging.info(f'Making game from {prompt}')
     per_player = 3
     words = get_target_words(prompt, n=(2 * per_player))
 
