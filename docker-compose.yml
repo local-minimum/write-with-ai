@@ -17,6 +17,8 @@ services:
     build: .
     restart: unless-stopped
     ports: ["8080"]
+    volumes:
+      - ./with_ai/data:/srv/with_ai/data
     environment:
       - WIA_LOGLEVEL
 

@@ -1,9 +1,11 @@
 from functools import cache
+from glob import glob
 import os
 from random import sample
 from typing import Optional
 
 from gensim.models.keyedvectors import KeyedVectors  # type: ignore
+import gensim.downloader as api
 
 
 MAX_CONTEXT = 26
@@ -11,11 +13,17 @@ MAX_CONTEXT = 26
 
 @cache
 def load_model() -> KeyedVectors:
-    return KeyedVectors.load(os.path.join(
+    path = os.path.join(
         os.path.dirname(__file__),
         'data',
         'model',
-    ))
+    )
+
+    if not glob(f'{path}*'):
+        model = api.load('glove-wiki-gigaword-50')
+        model.save(path)
+
+    return KeyedVectors.load(path)
 
 
 def unique(options: list[str]) -> list[str]:
