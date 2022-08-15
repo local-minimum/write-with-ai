@@ -15,11 +15,12 @@ logging.basicConfig(
 
 
 app = Flask('Collab with AI')
-CORS(app, origins=[
+CORS(app)
+""", origins=[
     'https://local_minimum.itch.io/contribute-human',
     'https://hum.localminimum.se',
     'http://localhost:8099',
-])
+])"""
 app.config['SECRET_KEY'] = token_urlsafe(16)
 
 
