@@ -114,6 +114,9 @@ function GameContainer(): JSX.Element {
         } else {
           setStory([...story, [word, false]]);
           queryClient.invalidateQueries(['ai-guess']);
+          if (story.slice(story.length - 3).map(([_, byHuman]) => !byHuman).every((v) => v)) {
+            setHumanTurn(true);
+          }
         }
       },
     },
