@@ -39,7 +39,7 @@ function Game({
 
   return (
     <Paper sx={{ m: 2, minHeight: '90vh', padding: 1 }} elevation={2}>
-      <Typography variant="h1">Collaborate Human!</Typography>
+      <Typography variant="h1">Collaborate, Human!</Typography>
       <Stack sx={{ maxWidth: '800px' }} gap={1}>
         <SecretWordsView secretWords={secretWords} gameState={gameState} />
         <CollaboratedStory story={story} />

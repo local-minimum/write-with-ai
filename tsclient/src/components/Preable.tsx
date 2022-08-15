@@ -40,7 +40,7 @@ function Preamble({ gameState, onNextState }: PreambleProps): JSX.Element {
           {' '}
           <b>team</b>
           {' '}
-          have each others&apos; you win
+          have revealed six, you win
           (or if there is only one left and you&apos;ve been at it for a long time
           it is also a kind of victory).
           Each side only knows the common written story and how long the hidden

@@ -28,7 +28,7 @@ def create_game():
         abort(400, 'Request must be json')
 
     logging.info(f'Making game from {prompt}')
-    per_player = 3
+    per_player = 4
     words = get_target_words(prompt, n=(2 * per_player))
 
     human = words[:per_player]
