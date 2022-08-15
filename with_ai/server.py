@@ -3,6 +3,7 @@ import logging
 from secrets import token_urlsafe
 
 from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
 
 from .ai import get_next_word, get_target_words
 
@@ -14,6 +15,11 @@ logging.basicConfig(
 
 
 app = Flask('Collab with AI')
+CORS(app, origins=[
+    'https://local_minimum.itch.io/contribute-human',
+    'https://hum.localminimum.se',
+    'http://localhost:8099',
+])
 app.config['SECRET_KEY'] = token_urlsafe(16)
 
 

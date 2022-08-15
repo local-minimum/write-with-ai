@@ -1,3 +1,4 @@
 gensim
 Flask
 gunicorn
+flask-cors
