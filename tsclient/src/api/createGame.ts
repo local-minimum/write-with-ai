@@ -1,4 +1,5 @@
 import { TextWord } from '../components/TextWord';
+import { API_DOMAIN } from './domain';
 import { SecretWord, SecretWords } from './types';
 
 interface ResponseJSON {
@@ -10,7 +11,7 @@ function createGame(
   prompt: TextWord[],
 ): Promise<SecretWords> {
   return fetch(
-    './api/create',
+    `${API_DOMAIN}/api/create`,
     {
       method: 'POST',
       headers: {

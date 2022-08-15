@@ -1,4 +1,5 @@
 import { TextWord } from '../components/TextWord';
+import { API_DOMAIN } from './domain';
 import { SecretWords } from './types';
 
 interface GuessResponse {
@@ -22,7 +23,7 @@ function makeAIGuess(
   const mustTarget = target ?? (shallLead ? remainingSecrets[0] : undefined);
 
   return fetch(
-    './api/play',
+    `${API_DOMAIN}/api/play`,
     {
       method: 'POST',
       headers: {
