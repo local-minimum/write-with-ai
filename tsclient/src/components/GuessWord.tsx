@@ -10,6 +10,7 @@ const Hidden = styled('span')({
   paddingRight: 8,
   paddingTop: 2,
   paddingBottom: 2,
+  color: '#eee',
 });
 
 const Solved = styled('span')({
@@ -45,7 +46,7 @@ interface GuessWordProps {
 function GuessWordSpan({ word, revealed, humanWord = false }: GuessWordProps): JSX.Element {
   if (revealed) return <Solved>{word}</Solved>;
   if (humanWord) return <Unsolved>{word}</Unsolved>;
-  return <Hidden>{word.replace(/./g, '\u00A0')}</Hidden>;
+  return <Hidden>{word.replace(/./g, '?')}</Hidden>;
 }
 
 export default GuessWordSpan;

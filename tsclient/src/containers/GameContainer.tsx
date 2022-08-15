@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 import createGame from '../api/createGame';
 import makeAIGuess from '../api/makeAIGuess';
-import { SecretWords } from '../api/types';
+import { SecretWord, SecretWords } from '../api/types';
 import Game from '../components/Game';
 import Preamble from '../components/Preable';
 import { TextWord } from '../components/TextWord';
@@ -55,7 +55,7 @@ function GameContainer(): JSX.Element {
 
   const handleResetGame = React.useCallback((): void => {
     setSecretWords(undefined);
-    setGameState(GameState.Introduction);
+    setGameState(GameState.Preamble);
   }, [setGameState, setSecretWords]);
 
   const handleNextState = React.useCallback((): void => {
@@ -72,11 +72,25 @@ function GameContainer(): JSX.Element {
         return setGameState(GameState.Victory);
       case GameState.Victory:
         setSecretWords(undefined);
-        return setGameState(GameState.Prompt);
+        return setGameState(GameState.Preamble);
+      case GameState.Surrender:
+        setSecretWords(undefined);
+        return setGameState(GameState.Preamble);
       default:
         return setGameState(GameState.Preamble);
     }
   }, [gameState, setGameState, setSecretWords]);
+
+  const handleSurrender = React.useCallback(() => {
+    if (secretWords !== undefined) {
+      const { human, ai } = secretWords;
+      setSecretWords({
+        human,
+        ai: ai.map<SecretWord>(([word]) => [word, true]),
+      });
+    }
+    setGameState(GameState.Surrender);
+  }, [secretWords, setGameState, setSecretWords]);
 
   useQuery(
     ['generate'],
@@ -136,7 +150,8 @@ function GameContainer(): JSX.Element {
     if (isPunctuation(guess)) {
       setStory([...story, [guess, true]]);
     } else {
-      setStory([...story, [' ', false], [guess, true]]);
+      const word = transformGuess(guess, story[story.length - 1]?.[0]);
+      setStory([...story, [' ', false], [word, true]]);
       setHumanTurn(false);
     }
 
@@ -189,6 +204,7 @@ function GameContainer(): JSX.Element {
         smallVictory={smallVictory}
         onProgressGameState={handleNextState}
         onResetGame={handleResetGame}
+        onSurrender={handleSurrender}
       />
     </>
   );

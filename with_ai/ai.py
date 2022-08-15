@@ -1,29 +1,47 @@
 from functools import cache
 from glob import glob
+import logging
 import os
 from random import sample
 from typing import Optional
 
 from gensim.models.keyedvectors import KeyedVectors  # type: ignore
-import gensim.downloader as api
+import gensim.downloader as api  # type: ignore
 
 
 MAX_CONTEXT = 26
+PUNCTUATION = """ ,.:?!;_/\\+*=%&^@#$()[\]{}<>'"\-"""
+MODELS = {
+    "model": 'glove-wiki-gigaword-50',
+    "twitter": 'glove-twitter-25',
+}
+
+
+def defined_or(value, fallback):
+    return fallback if value is None else value
 
 
 @cache
 def load_model() -> KeyedVectors:
+    model = defined_or(os.environ.get('WIA_MODEL'), 'model')
+    if model not in MODELS:
+        logging.warning(f'Model {model} is not known.')
+        model = 'model'
+
     path = os.path.join(
         os.path.dirname(__file__),
         'data',
-        'model',
+        model,
     )
 
     if not glob(f'{path}*'):
-        model = api.load('glove-wiki-gigaword-50')
+        logging.info(f'Downloading {model} model.')
+        model = api.load(MODELS[model])
         model.save(path)
 
-    return KeyedVectors.load(path)
+    vectors = KeyedVectors.load(path)
+    logging.info('Model loaded')
+    return vectors
 
 
 def unique(options: list[str]) -> list[str]:
@@ -50,7 +68,7 @@ def get_target_words(
     for _ in range(samples):
         (w, _) = model.most_similar(positive=text[-MAX_CONTEXT:])[0]
         text.append(w)
-        if w not in original:
+        if w not in original and w not in PUNCTUATION:
             options.append(w)
 
     options = unique(options)

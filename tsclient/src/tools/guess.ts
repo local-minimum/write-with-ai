@@ -14,13 +14,11 @@ export function asLex(word: string): string {
 }
 
 export function reveal(
-  secrets: [SecretWord, SecretWord, SecretWord],
+  secrets: SecretWord[],
   position: number,
-): [SecretWord, SecretWord, SecretWord] {
+): SecretWord[] {
   return secrets
-    .map(([lex, revealed], idx) => (idx === position ? [lex, true] : [lex, revealed])) as [
-      SecretWord, SecretWord, SecretWord
-    ];
+    .map(([lex, revealed], idx) => (idx === position ? [lex, true] : [lex, revealed]));
 }
 
 export function transformGuess(

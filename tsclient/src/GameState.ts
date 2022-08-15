@@ -5,6 +5,7 @@ enum GameState {
   Setup = 'setup',
   Play = 'play',
   Victory = 'victory',
+  Surrender = 'surrender',
 }
 
 export default GameState;

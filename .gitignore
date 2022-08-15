@@ -55,7 +55,7 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
+# Django stuf.1 -f:
 *.log
 local_settings.py
 db.sqlite3
@@ -69,12 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
+docs/_build/.1 -ebook
 .ipynb_checkpoints
 
 # IPython
@@ -130,5 +125,4 @@ dmypy.json
 
 
 # Ignore the model
-/with_ai/data/model
-/with_ai/data/model.vectors.npy
+/with_ai/data

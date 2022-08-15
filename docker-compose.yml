@@ -21,6 +21,7 @@ services:
       - ./with_ai/data:/srv/with_ai/data
     environment:
       - WIA_LOGLEVEL
+      - WIA_MODEL
 
   with_ai_frontend:
     build: ./tsclient

@@ -21,6 +21,7 @@ interface GameProps {
   smallVictory: boolean;
   onProgressGameState: () => void;
   onResetGame: () => void;
+  onSurrender: () => void;
 }
 
 /*
@@ -33,7 +34,7 @@ interface GameProps {
 
 function Game({
   secretWords, story, gameState, humanTurn, onAddGuess, smallVictory,
-  onProgressGameState, onResetGame,
+  onProgressGameState, onResetGame, onSurrender,
 }: GameProps): JSX.Element {
   const words = story.filter(([lex]) => !isPunctuation(lex)).length;
 
@@ -65,15 +66,26 @@ function Game({
               Claim minor victory.
             </Button>
           )}
-          {gameState === GameState.Play && !smallVictory && words > 150 && (
+          {gameState === GameState.Play && !smallVictory && words > 75 && (
             <Button
               variant="outlined"
-              onClick={onResetGame}
+              onClick={onSurrender}
               title="Have made a long text together and that at least counts for something"
               startIcon={<FontAwesomeIcon icon={faPerson} />}
               endIcon={<FontAwesomeIcon icon={faRobot} />}
             >
-              Give up / Get new attempt
+              Give up
+            </Button>
+          )}
+          {gameState === GameState.Surrender && (
+            <Button
+              variant="outlined"
+              onClick={onResetGame}
+              title="Everyone has to start cooperation somewhere"
+              startIcon={<FontAwesomeIcon icon={faPerson} />}
+              endIcon={<FontAwesomeIcon icon={faRobot} />}
+            >
+              New Attempt
             </Button>
           )}
           <Box sx={{ flex: 1 }} />

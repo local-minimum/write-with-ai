@@ -3,24 +3,19 @@ import logging
 from secrets import token_urlsafe
 
 from flask import Flask, abort, jsonify, request
-from flask_cors import CORS
+from flask_cors import CORS  # type: ignore
 
 from .ai import get_next_word, get_target_words
 
 
 logging.basicConfig(
-    level=int(os.environ.get("WAI_LOGLEVEL", logging.INFO)),
+    level=int(os.environ.get("WIA_LOGLEVEL", logging.INFO)),
     format="%(asctime)s  %(levelname)s  %(message)s",
 )
 
 
 app = Flask('Collab with AI')
 CORS(app)
-""", origins=[
-    'https://local_minimum.itch.io/contribute-human',
-    'https://hum.localminimum.se',
-    'http://localhost:8099',
-])"""
 app.config['SECRET_KEY'] = token_urlsafe(16)
 
 
@@ -59,5 +54,7 @@ def play_game():
     secrets = defined_or(json.get('aiSecrets'), [])
 
     return jsonify({
-        'guess': get_next_word(prompt, lead, target, guess_word_lengths, secrets),
+        'guess': get_next_word(
+            prompt, lead, target, guess_word_lengths, secrets,
+        ),
     })
